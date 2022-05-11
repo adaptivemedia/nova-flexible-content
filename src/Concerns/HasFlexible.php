@@ -2,6 +2,7 @@
 
 namespace Whitecube\NovaFlexibleContent\Concerns;
 
+use Illuminate\Support\Str;
 use Whitecube\NovaFlexibleContent\Layouts\Layout;
 use Whitecube\NovaFlexibleContent\Layouts\Collection;
 use Illuminate\Support\Collection as BaseCollection;
@@ -133,6 +134,13 @@ trait HasFlexible {
 
         if(is_null($name)) {
             return;
+        }
+
+        // Fallback to global config mapping if none provided
+        if (! $layoutMapping && ($layouts = config('flexible.layouts'))) {
+            $layoutMapping = collect($layouts)
+                ->mapWithKeys(fn($class) => [Str::kebab(class_basename($class)) => $class])
+                ->toArray();
         }
 
         return $this->createMappedLayout($name, $key, $attributes, $layoutMapping);
