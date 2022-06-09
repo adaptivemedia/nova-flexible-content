@@ -101,6 +101,14 @@ export default {
         };
     },
 
+    mounted() {
+        const collapsed = localStorage.getItem(this.getCollapsedKey());
+        //console.log("Is " + this.getCollapsedKey() + " collapsed?", collapsed);
+        if (collapsed === "true") {
+            this.collapse();
+        }
+    },
+
     computed: {
         titleStyle() {
             let classes = ['border-t', 'border-r', 'border-l', 'border-gray-200', 'dark:border-gray-700', 'rounded-t-lg'];
@@ -160,6 +168,7 @@ export default {
          */
         expand() {
             this.collapsed = false;
+            this.saveCollapsedState(false);
         },
 
         /**
@@ -167,6 +176,16 @@ export default {
          */
         collapse() {
             this.collapsed = true;
+            this.saveCollapsedState(true);
+        },
+
+        saveCollapsedState(collapsed) {
+            localStorage.setItem(this.getCollapsedKey(), collapsed);
+            //console.log("set value for " + this.getCollapsedKey(), window.localStorage.getItem(this.getCollapsedKey()));
+        },
+
+        getCollapsedKey() {
+            return `resource_${this.resourceId}_group_collapsed_${this.group.key}`;
         }
     },
 }
