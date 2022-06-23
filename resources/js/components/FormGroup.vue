@@ -1,5 +1,5 @@
 <template>
-    <div class="relative mb-4 pb-1" :id="group.key">
+    <div class="flexible-field-group relative mb-4 pb-1" :id="group.key">
         <div class="w-full shrink">
             <div :class="titleStyle" v-if="group.title">
                 <div class="h-8 leading-normal h-full flex items-center box-content"
@@ -103,10 +103,13 @@ export default {
 
     mounted() {
         const collapsed = localStorage.getItem(this.getCollapsedKey());
-        //console.log("Is " + this.getCollapsedKey() + " collapsed?", collapsed);
+
         if (collapsed === "true") {
             this.collapse();
         }
+
+        Nova.$on('collapse-all-fields', () => this.collapse());
+        Nova.$on('expand-all-fields', () => this.expand());
     },
 
     computed: {
@@ -179,14 +182,19 @@ export default {
             this.saveCollapsedState(true);
         },
 
+        /**
+         * Save collapsed state
+         */
         saveCollapsedState(collapsed) {
             localStorage.setItem(this.getCollapsedKey(), collapsed);
-            //console.log("set value for " + this.getCollapsedKey(), window.localStorage.getItem(this.getCollapsedKey()));
         },
 
+        /**
+         * Get the local storage key for collapsed state
+         */
         getCollapsedKey() {
             return `resource_${this.resourceId}_group_collapsed_${this.group.key}`;
-        }
+        },
     },
 }
 </script>
