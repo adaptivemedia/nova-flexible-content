@@ -205,11 +205,9 @@ export default {
             let subTitle = '';
             group.fields.forEach((item) => {
                 if (item.value && item.name == 'Title') {
-                    subTitle = item.value;
+                    subTitle = item.value.replace(/(<([^>]+)>)/gi, "");
                 }
             });
-
-            subTitle = subTitle.replace(/(<([^>]+)>)/gi, "");
 
             if(subTitle.length > 38) {
                 subTitle = subTitle.substring(0,38) + '..';
