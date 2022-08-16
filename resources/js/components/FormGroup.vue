@@ -25,7 +25,12 @@
 
                     <p class="text-80 font-bold grow px-4">
                       <span class="mr-3 font-semibold">#{{ index + 1 }}</span>
-                      {{ group.title }}
+                        {{ group.title }}
+                        <span
+                            v-if="getGroupSubTitle(group)"
+                            class="text-gray-400"
+                            v-html="getGroupSubTitle(group)"
+                        />
                     </p>
 
                     <div class="flex" v-if="!readonly">
@@ -195,6 +200,23 @@ export default {
         getCollapsedKey() {
             return `resource_${this.resourceId}_group_collapsed_${this.group.key}`;
         },
+
+        getGroupSubTitle(group) {
+            let subTitle = '';
+            group.fields.forEach((item) => {
+                if (item.name == 'Title') {
+                    subTitle = item.value;
+                }
+            });
+
+            subTitle = subTitle.replace(/(<([^>]+)>)/gi, "");
+
+            if(subTitle.length > 38) {
+                subTitle = subTitle.substring(0,38) + '..';
+            }
+
+            return subTitle ? `(${subTitle})` : '';
+        }
     },
 }
 </script>
