@@ -204,7 +204,7 @@ export default {
         getGroupSubTitle(group) {
             let subTitle = '';
             group.fields.forEach((item) => {
-                if (item.name == 'Title') {
+                if (item.value && item.name == 'Title') {
                     subTitle = item.value;
                 }
             });
