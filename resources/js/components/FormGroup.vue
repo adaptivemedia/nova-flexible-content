@@ -201,11 +201,20 @@ export default {
             return `resource_${this.resourceId}_group_collapsed_${this.group.key}`;
         },
 
+        /**
+         * Adds a secondary title that explains the group's content
+         */
         getGroupSubTitle(group) {
             let subTitle = '';
             group.fields.forEach((item) => {
-                if (item.value && item.name == 'Title') {
+                if (item.value && item.name === 'Title') {
                     subTitle = item.value.replace(/(<([^>]+)>)/gi, "");
+                } else if (item.value && ['two-columns', 'two-columns-with-sticky-image'].includes(group.name)) {
+                    if (item.name === 'Column left') {
+                        subTitle = item.value[0]?.layout;
+                    } else if (item.name === 'Column right') {
+                        subTitle += ' + ' + item.value[0]?.layout;
+                    }
                 }
             });
 
