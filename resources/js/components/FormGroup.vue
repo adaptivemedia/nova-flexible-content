@@ -1,5 +1,5 @@
 <template>
-    <div class="relative mb-4 pb-1" :id="group.key">
+    <div class="flexible-field-group relative mb-4 pb-1" :id="group.key">
         <div class="w-full shrink">
             <div :class="titleStyle" v-if="group.title">
                 <div class="h-8 leading-normal h-full flex items-center box-content"
@@ -23,9 +23,14 @@
                         <icon type="minus" class="align-top" width="16" height="16" />
                     </button>
 
-                    <p class="text-80 grow px-4">
+                    <p class="text-80 font-bold grow px-4">
                       <span class="mr-3 font-semibold">#{{ index + 1 }}</span>
-                      {{ group.title }}
+                        {{ group.title }}
+                        <span
+                            v-if="getGroupSubTitle(group)"
+                            class="text-gray-400"
+                            v-html="getGroupSubTitle(group)"
+                        />
                     </p>
 
                     <div class="flex" v-if="!readonly">
@@ -115,7 +120,16 @@ export default {
             readonly: this.group.readonly,
         };
     },
+    mounted() {
+        const collapsed = localStorage.getItem(this.getCollapsedKey());
+        //console.log("Is " + this.getCollapsedKey() + " collapsed?", collapsed);
+        if (collapsed === "true") {
+            this.collapse();
+        }
 
+        Nova.$on('collapse-all-fields', () => this.collapse());
+        Nova.$on('expand-all-fields', () => this.expand());
+    },
     computed: {
         titleStyle() {
             let classes = ['border-t', 'border-r', 'border-l', 'border-gray-200', 'dark:border-gray-700', 'rounded-t-lg'];
@@ -180,6 +194,8 @@ export default {
          */
         expand() {
             this.collapsed = false;
+
+            this.saveCollapsedState(false);
         },
 
         /**
@@ -187,6 +203,45 @@ export default {
          */
         collapse() {
             this.collapsed = true;
+            this.saveCollapsedState(true);
+        },
+
+        /**
+         * Save collapsed state
+         */
+        saveCollapsedState(collapsed) {
+            localStorage.setItem(this.getCollapsedKey(), collapsed);
+        },
+
+        /**
+         * Get the local storage key for collapsed state
+         */
+        getCollapsedKey() {
+            return `resource_${this.resourceId}_group_collapsed_${this.group.key}`;
+        },
+
+        /**
+         * Adds a secondary title that explains the group's content
+         */
+        getGroupSubTitle(group) {
+            let subTitle = '';
+            group.fields.forEach((item) => {
+                if (item.value && item.name === 'Title') {
+                    subTitle = item.value.replace(/(<([^>]+)>)/gi, "");
+                } else if (item.value && ['two-columns', 'two-columns-with-sticky-image'].includes(group.name)) {
+                    if (item.name === 'Column left') {
+                        subTitle = item.value[0]?.layout;
+                    } else if (item.name === 'Column right') {
+                        subTitle += ' + ' + item.value[0]?.layout;
+                    }
+                }
+            });
+
+            if(subTitle.length > 38) {
+                subTitle = subTitle.substring(0,38) + '..';
+            }
+
+            return subTitle ? `(${subTitle})` : '';
         }
     },
 }

@@ -5,9 +5,32 @@
         :field="currentField"
         :errors="errors"
         :show-help-text="showHelpText"
+        ref="flexibleField"
         full-width-content>
         <template #field>
-
+            <div
+                v-if="! isInsideFieldGroup()"
+                class="flex justify-between mb-4">
+                <div></div>
+                <div class="flex">
+                    <button
+                        dusk="expand-all-group"
+                        type="button"
+                        class="group-control btn border border-r-0 border-gray-200 dark:border-gray-700 w-8 h-8 block"
+                        :title="__('Expand all')"
+                        @click.prevent="expandAll">
+                        <icon type="plus" class="align-top" width="16" height="16" />
+                    </button>
+                    <button
+                        dusk="collapse-all-group"
+                        type="button"
+                        class="group-control btn border border-gray-200 dark:border-gray-700 w-8 h-8 block"
+                        :title="__('Collapse all')"
+                        @click.prevent="collapseAll">
+                        <icon type="minus" class="align-top" width="16" height="16" />
+                    </button>
+                </div>
+            </div>
             <div ref="flexibleFieldContainer">
                 <form-nova-flexible-content-group
                     v-for="(group, index) in orderedGroups"
@@ -110,6 +133,11 @@ export default {
     },
 
     methods: {
+        isInsideFieldGroup() {
+            const field = this.$refs.flexibleField;
+            if (! field) return;
+            return field.$el.closest('.flexible-field-group') !== null;
+        },
         /*
          * Set the initial, internal value for the field.
          */
@@ -284,6 +312,18 @@ export default {
                     }
                  }
             });
+        },
+        /**
+         * Expand all fields
+         */
+        expandAll() {
+            Nova.$emit('expand-all-fields');
+        },
+        /**
+         * Collapse all fields
+         */
+        collapseAll() {
+            Nova.$emit('collapse-all-fields');
         },
     }
 }
